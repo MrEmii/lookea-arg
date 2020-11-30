@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "512560856085",
+    "firebase_url": "https://lookea-arg.firebaseio.com",
+    "project_id": "lookea-arg",
+    "storage_bucket": "lookea-arg.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:512560856085:android:ab3ccc9b4df48f78d6a21c",
+        "android_client_info": {
+          "package_name": "ar.com.lookea"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "512560856085-kpsctpf1itnf7h4qm5mj6s9prk6g98or.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ar.com.lookea",
+            "certificate_hash": "94ad8564f234ae71452dee844f1217f02ab2eca8"
+          }
+        },
+        {
+          "client_id": "512560856085-8l5slul64r2hkouprrl62gevdu7qafq0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBhx7BbV-gZKT_GajE2hnbQzogd-GVlXdM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "512560856085-8l5slul64r2hkouprrl62gevdu7qafq0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
