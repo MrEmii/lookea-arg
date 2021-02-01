@@ -250,27 +250,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
           },
           child: NestedScrollView(
             headerSliverBuilder: (context, innerBoxIsScrolled) {
+              print(innerBoxIsScrolled);
               return [
                 SliverPersistentHeader(
-                  pinned: true,
+                  pinned: false,
+                  floating: true,
                   delegate: PersistentHeaderDelegate(
-                    maxExtents: 230,
-                    minExtends: 90,
+                    maxExtents: 130,
+                    minExtends: 40,
                     child: Stack(
                       children: [
                         CustomPaint(
-                          size: new Size(MediaQuery.of(context).size.width, 230),
-                          painter: WaveTop(),
+                          size: new Size(MediaQuery.of(context).size.width, 130),
+                          painter: WaveNormal(),
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("Registrate", style: TextStyle(color: Colors.white, fontSize: 36, fontWeight: FontWeight.w600),),
-                              Text(innerBoxIsScrolled ? "Al registrarte aceptas nuestros términos y condiciones de uso." : "", softWrap: true, style: TextStyle(color: Colors.white, fontSize: 14,),)
-                            ],
-                          ),
+                          child: Text("Registrate", style: TextStyle(color: Colors.white, fontSize: 36, fontWeight: FontWeight.w600),)
                         )
                       ],
                     )

@@ -1,6 +1,5 @@
 import 'dart:async';
-
-import 'package:flutter/foundation.dart';
+import 'package:lookea/utils/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
@@ -22,28 +21,7 @@ class MapScreen extends StatefulWidget {
   @override
   _MapScreenState createState() => _MapScreenState();
 }
-extension MyDateUtils on DateTime {
-  DateTime copyWith(
-      {int year,
-      int month,
-      int day,
-      int hour,
-      int minute,
-      int second,
-      int millisecond,
-      int microsecond}) {
-    return DateTime(
-      year ?? this.year,
-      month ?? this.month,
-      day ?? this.day,
-      hour ?? this.hour,
-      minute ?? this.minute,
-      second ?? this.second,
-      millisecond ?? this.millisecond,
-      microsecond ?? this.microsecond,
-    );
-  }
-}
+
 
 class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin{
 
@@ -107,15 +85,21 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin{
                         Text(element.address, textAlign: TextAlign.left, style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),),
                         Text("Abierto ${element.available.length == 7 ?  "todos los días" : "los días " + avaiableString.replaceFirst("," , " y", avaiableString.lastIndexOf(",")-1)} de ${element.from.substring(0, 5)} hasta las ${element.at.substring(0, 5)}", textAlign: TextAlign.left, style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),),
                         if(isOpen)
-                          Expanded(child: Center(
-                            child: ButtonComponent(
-                              onTap: () {},
-                              background: LColors.gray2,
-                              margin: EdgeInsets.all(40),
-                              width: MediaQuery.of(context).size.width / 1.8,
-                              text: Text("Ver más", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-                            )
-                          ))
+                          Expanded(
+                            flex: 1,
+                            child: Align(
+                              alignment: Alignment.bottomCenter,
+                              child: ButtonComponent(
+                                height: 60,
+                                background: Colors.white12,
+                                onTap: () => Navigator.pushNamed(context, "/shop", arguments: element),
+                                margin: EdgeInsets.all(10),
+                                padding: EdgeInsets.symmetric(vertical: 14),
+                                width: MediaQuery.of(context).size.width / 1.8,
+                                text: Text("Ir a ver", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                              ),
+                            ),
+                          )
                         else
                           Expanded(child: Center(child: Text("CERRADO", textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold),)))
                       ],
@@ -148,7 +132,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin{
   Widget build(BuildContext context) {
     Future<Position> position = Geolocator.getLastKnownPosition();
 
-    MainProvider provider = Provider.of<MainProvider>(context, listen: false);
+    MainProvider provider = Provider.of<MainProvider>(context);
 
     return FutureBuilder(
       future: position,
@@ -168,7 +152,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin{
                   new TileLayerOptions(
                     urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
                     subdomains: ['a', 'b', 'c'],
-                    retinaMode: false
+                    retinaMode: true
                   ),
                   MarkerLayerOptions(
                     markers: [
@@ -194,7 +178,23 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin{
                   )
                 ]
               ),
-
+              Positioned(
+                top: 10,
+                right: 10,
+                child: Container(
+                  decoration: ShapeDecoration(
+                    color: LColors.black9,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18.0),
+                    )
+                  ),
+                  child: IconButton(
+                    icon: Icon(LIcons.user_location),
+                    tooltip: "Centra tu ubicación",
+                    onPressed: () => mapController.move(new LatLng(snapshot.data.latitude, snapshot.data.longitude), 17)
+                  ),
+                ),
+              ),
               Positioned.fill(
                 child: DraggableScrollableActuator(
                   child: DraggableScrollableSheet(

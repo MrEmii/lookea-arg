@@ -10,7 +10,6 @@ class HomePersistentHeaderDelegate extends SliverPersistentHeaderDelegate{
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
 
     return Container(
-      color: Colors.white,
       padding: EdgeInsets.symmetric(horizontal: 30),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -20,8 +19,8 @@ class HomePersistentHeaderDelegate extends SliverPersistentHeaderDelegate{
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              IconButton(icon: Icon(LIcons.align_left, color: LColors.black9,), onPressed: () => Navigator.pushNamed(context, "/account")),
-              IconButton(icon: Icon(LIcons.bell, color: LColors.black9,), onPressed: () => Navigator.pushNamed(context, "/notifications"))
+              IconButton(icon: Icon(LIcons.align_left, color: Colors.white,), onPressed: () => Navigator.pushNamed(context, "/account")),
+              IconButton(icon: Icon(LIcons.bell, color: Colors.white,), onPressed: () => Navigator.pushNamed(context, "/notifications"))
             ],
           ),
           CachedImage(

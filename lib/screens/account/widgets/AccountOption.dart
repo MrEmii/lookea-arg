@@ -36,7 +36,7 @@ class AccountOption extends StatelessWidget {
             Container(
               width: 54,
               height: 54,
-              margin: EdgeInsets.only(right: 10),
+              margin: EdgeInsets.only(right: 20 ),
               decoration: BoxDecoration(
                 color: color,
                 borderRadius: BorderRadius.circular(15)

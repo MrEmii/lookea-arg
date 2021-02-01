@@ -33,8 +33,9 @@ class TextInputComponent extends StatefulWidget {
   final TextCapitalization capitalization;
   final Function(String) onChanged;
   final bool autocorrect;
+  final Function onTap;
 
-  TextInputComponent({Key key, this.width, this.autocorrect = true, this.capitalization, this.suffixIcon, this.autoFocus = false, this.action, this.onSubmit, this.node, this.readOnly = false, this.inputFormatters, this.prefixIcon, this.placeholder, this.padding, this.textAlign, this.controller, this.validator, this.type, this.passwordEnabled, this.filled, this.fillColor, this.placeholderStyle, this.border, this.enabledBorder, this.contentPadding, this.style, this.multiLine, this.margin, this.onChanged});
+  TextInputComponent({Key key, this.width, this.onTap, this.autocorrect = true, this.capitalization, this.suffixIcon, this.autoFocus = false, this.action, this.onSubmit, this.node, this.readOnly = false, this.inputFormatters, this.prefixIcon, this.placeholder, this.padding, this.textAlign, this.controller, this.validator, this.type, this.passwordEnabled, this.filled, this.fillColor, this.placeholderStyle, this.border, this.enabledBorder, this.contentPadding, this.style, this.multiLine, this.margin, this.onChanged});
 
   @override
   _TextInputComponentState createState() => _TextInputComponentState();
@@ -53,6 +54,7 @@ class _TextInputComponentState extends State<TextInputComponent> {
       margin:  this.widget.margin ?? EdgeInsets.zero,
       child: TextFormField(
         key: key,
+        onTap: widget.onTap,
         textCapitalization: widget.capitalization ?? TextCapitalization.sentences,
         autofocus: widget.autoFocus,
         autocorrect: widget.autocorrect,

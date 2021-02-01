@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lookea/local_data/local_data.dart';
 import 'package:lookea/widgets/LColors.dart';
 import 'package:lookea/widgets/Waves.dart';
 import 'package:lookea/widgets/button.dart';
@@ -25,7 +26,7 @@ class StartupScreen extends StatelessWidget {
               children: [
                 CustomPaint(
                   size: new Size(MediaQuery.of(context).size.width, 200),
-                  painter: WaveTop(),
+                  painter: WaveLarge(),
                 ),
                 Positioned(
                   top: 0,

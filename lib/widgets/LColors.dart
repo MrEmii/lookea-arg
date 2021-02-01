@@ -63,6 +63,7 @@ class LColors {
   static LinearGradient azurLane = LinearGradient(
     begin: Alignment.topLeft,
     end:   Alignment.bottomRight,
+    transform: GradientRotation(36),
     colors: [
       Color(0xFF7F7FD5),
       Color(0xFF86A8E7),

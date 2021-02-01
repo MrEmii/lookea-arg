@@ -20,6 +20,18 @@ class FirebaseUtils{
     return Future.value(model);
   }
 
+  static Future<List<ShopModel>> getShops() async {
+    Stream<QuerySnapshot> stream = firestore.collection("/locals").snapshots();
+
+    QuerySnapshot snapshot = await stream.first;
+    List<ShopModel> models = snapshot.docs.map((e) => ShopModel.fromJson(e.data())).toList();
+
+    print("=========== MODELS ================");
+    print(models);
+
+    return models;
+  }
+
   static Future<UserModel> getUser(String id) async {
     DocumentSnapshot userData = await firestore.collection("users").doc(id).get();
     UserModel model = UserModel.fromJson(userData.data());
@@ -31,9 +43,8 @@ class FirebaseUtils{
       await auth.currentUser.updateEmail(add["mail"]);
       await auth.currentUser.sendEmailVerification();
     }
-    await firestore.collection("users").doc(auth.currentUser.uid).update(model.toJson(toSQL: false));
-    await LocalData.db.updateUser(model);
-    LocalData.user = model;
+    await firestore.collection("users").doc(auth.currentUser.uid).update(model.toJson());
+    LocalData.db.updateUser(model);
   }
 
   static Future<String> uploadFile({String path, String id, File image}) async {
@@ -102,10 +113,26 @@ class FirebaseUtils{
     return "Server error";
   }
 
+  static Future<String> resetPassword({String email}) async{
+    try{
+      await FirebaseUtils.auth.sendPasswordResetEmail(email: email);
+      return "";
+    } on FirebaseAuthException catch (e) {
+      print("========= ERROR =========");
+      if (e.code == 'invalid-email') {
+        return 'El correo no es correcto';
+      } else if(e.code == "user-not-found"){
+        return "El correo no existe";
+      }
+    } catch (e) {
+      print(e);
+    }
+    return "Server error";
+  }
+
   static void logout() async{
     await auth.signOut();
-    await LocalData.db.removeSession();
-    LocalData.user = null;
+    LocalData.db.removeUser();
   }
 
 }

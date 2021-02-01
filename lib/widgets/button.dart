@@ -22,7 +22,7 @@ class ButtonComponent extends StatelessWidget {
     return GestureDetector(
       onTap: onTap ?? (){},
       child: this.child ?? Container(
-        width: this.width ?? 100,
+        width: this.width ?? null,
         height: this.height ?? null,
         padding: this.padding ?? EdgeInsets.all(10),
         margin: this.margin ?? EdgeInsets.zero,

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:grouped_list/grouped_list.dart';
+import 'package:lookea/providers/MainProvider.dart';
 import 'package:lookea/screens/start/widgets/ReservationCard.dart';
 import 'package:lookea/widgets/LColors.dart';
 import 'package:lookea/widgets/LIcons.dart';
 import 'package:lookea/widgets/text_input.dart';
-
+import 'package:provider/provider.dart';
+import 'package:lookea/utils/extensions.dart';
 
 class ReservationScreen extends StatefulWidget {
 
@@ -14,30 +16,14 @@ class ReservationScreen extends StatefulWidget {
 
 class _ReservationScreenState extends State<ReservationScreen> {
 
-  final dataSet = [
-    {'name': 'John', 'group': 'Noviembre'},
-    {'name': 'Will', 'group': 'Marzo'},
-    {'name': 'Beth', 'group': 'Noviembre'},
-    {'name': 'Miranda', 'group': 'Noviembre'},
-    {'name': 'Mike', 'group': 'Septiembre'},
-    {'name': 'Danny', 'group': 'Septiembre'},
-    {'name': 'Mike', 'group': 'Septiembre'},
-    {'name': 'Danny', 'group': 'Septiembre'},
-    {'name': 'Mike', 'group': 'Septiembre'},
-    {'name': 'Danny', 'group': 'Septiembre'},
-  ];
-
-  List<String> meses = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
-
   @override
   void initState() {
     super.initState();
   }
 
-
-
   @override
   Widget build(BuildContext context) {
+    MainProvider provider = Provider.of<MainProvider>(context);
 
     DateTime now = DateTime.now();
 
@@ -63,28 +49,44 @@ class _ReservationScreenState extends State<ReservationScreen> {
               },
             ),
             Expanded(
-              child: GroupedListView<dynamic, String>(
-                padding: EdgeInsets.only(bottom: 60),
-                elements: dataSet,
-                groupBy: (element) => element['group'],
-                groupComparator: (value1, value2) {
-                  int month1 = meses.indexOf(value1.toLowerCase());
-                  int month2 = meses.indexOf(value2.toLowerCase());
-                  return month1.compareTo(month2);
-                },
-                itemComparator: (item1, item2) => item1['name'].compareTo(item2['name']),
-                order: GroupedListOrder.DESC,
-                useStickyGroupSeparators: false,
-                groupSeparatorBuilder: (String value) => Padding(
-                  padding: EdgeInsets.symmetric(vertical: 5),
-                  child: Text(
-                    meses.indexOf(value.toLowerCase()) + 1 == now.month ? "Este mes" : value,
-                    textAlign: TextAlign.left,
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                itemBuilder: (c, element) {
-                  return ReservationCard();
+              child: FutureBuilder<List<dynamic>>(
+                future: provider.updateReservations(),
+                builder: (context, snapshot){
+                  if(snapshot.hasData){
+                    List<dynamic> data = snapshot.data;
+                    if(data.isEmpty){
+                      return Align(
+                        alignment: Alignment.topCenter,
+                        child: Text("Todavía no fuiste a ningun local!", style: TextStyle(color: LColors.gray4),)
+                      );
+                    }else{
+                      return GroupedListView<dynamic, String>(
+                        padding: EdgeInsets.only(bottom: 60),
+                        elements: data,
+                        groupBy: (element) => element['group'],
+                        groupComparator: (value1, value2) {
+                          int month1 = MainProvider.meses.indexOf(value1.toLowerCase());
+                          int month2 = MainProvider.meses.indexOf(value2.toLowerCase());
+                          return month1.compareTo(month2);
+                        },
+                        itemComparator: (item1, item2) => item1['model'].compareTo(item1['model']),
+                        order: GroupedListOrder.DESC,
+                        useStickyGroupSeparators: false,
+                        groupSeparatorBuilder: (String value) => Padding(
+                          padding: EdgeInsets.symmetric(vertical: 5),
+                          child: Text(MainProvider.meses.indexOf(value.toLowerCase()) + 1 == now.month ? "Este mes" : value.capitalize(), textAlign: TextAlign.left, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                        ),
+                        itemBuilder: (c, element) {
+                          return ReservationCard(element["model"]);
+                        },
+                      );
+                    }
+                  }else{
+                    return Align(
+                      alignment: Alignment.topCenter,
+                      child: CircularProgressIndicator()
+                    );
+                  }
                 },
               ),
             ),

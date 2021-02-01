@@ -1,11 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:lookea/local_data/local_data.dart';
+import 'package:lookea/models/reservation_model.dart';
 import 'package:lookea/models/shop_model.dart';
-
+import 'package:intl/intl.dart';
+import 'package:lookea/utils/firebase_utils.dart';
 
 class MainProvider extends ChangeNotifier{
-
 
   TextEditingController homeSearchController = TextEditingController(text: "");
   int currentTab = 0;
@@ -15,172 +17,28 @@ class MainProvider extends ChangeNotifier{
     "1": [],
     "2": []
   };
-
+  Map<String, List<ReservationModel>> reservations = {};
   Map<String, List<ShopModel>> proximityShops = {
     "0": [],
     "1": [],
     "2": []
   };
 
+  static List<String> meses = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+  static List<String> days = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"];
 
-  static var _locJSON = [
-  {
-    "address": "Nápoles 3766, San Miguel, Buenos Aires, Argentina",
-    "alias": "Lam-plex",
-    "at": "05:03:22.387216",
-    "from": "03:06:29.387703",
-    "available": ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes"],
-    "hairdress": [
-      {
-        "description": "description",
-        "image": "https://instagram.faep10-1.fna.fbcdn.net/v/t51.2885-15/sh0.08/e35/p640x640/124288946_799981497235754_3946732440877601169_n.jpg?_nc_ht=instagram.faep10-1.fna.fbcdn.net&_nc_cat=102&_nc_ohc=THNAVxZG-GgAX-ymy6Z&_nc_tp=24&oh=d27bfe7765a0b6cba41e63a27be720f0&oe=5FD5EB19",
-        "name": "name",
-        "price": 10,
-        "style": "style"
-      }
-    ],
-    "images": [
-      "https://i.pinimg.com/originals/43/7e/df/437edf96d102a55cd0cfb8809c12b39b.jpg"
-    ],
-    "type": 1,
-    "lat": -34.5543931,
-    "long": -58.744846900000006
-  },
-  {
-    "available": ["Lunes", "Martes", "Miercoles"],
-    "address": "Salerno 3449, San Miguel, Buenos Aires, Argentina",
-    "alias": "Transnamtechno",
-    "at": "18:39:20.387419",
-    "from": "16:58:50.387838",
-    "hairdress": [
-      {
-        "description": "description",
-        "image": "https://instagram.faep10-1.fna.fbcdn.net/v/t51.2885-15/sh0.08/e35/p640x640/124288946_799981497235754_3946732440877601169_n.jpg?_nc_ht=instagram.faep10-1.fna.fbcdn.net&_nc_cat=102&_nc_ohc=THNAVxZG-GgAX-ymy6Z&_nc_tp=24&oh=d27bfe7765a0b6cba41e63a27be720f0&oe=5FD5EB19",
-        "name": "name",
-        "price": 10,
-        "style": "style"
-      }
-    ],
-    "images": [
-      "https://i.pinimg.com/originals/43/7e/df/437edf96d102a55cd0cfb8809c12b39b.jpg"
-    ],
-    "type": 1,
-    "lat": -34.54960760000001,
-    "long": -58.74458979999999
-  },
-  {
-    "available": ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"],
-    "address": "Intendente Arricau 4070, San Miguel, Buenos Aires, Argentina",
-    "alias": "Con-strip",
-    "at": "18:28:47.387504",
-    "from": "06:55:36.387922",
-    "hairdress": [
-      {
-        "description": "description",
-        "image": "https://instagram.faep10-1.fna.fbcdn.net/v/t51.2885-15/sh0.08/e35/p640x640/124288946_799981497235754_3946732440877601169_n.jpg?_nc_ht=instagram.faep10-1.fna.fbcdn.net&_nc_cat=102&_nc_ohc=THNAVxZG-GgAX-ymy6Z&_nc_tp=24&oh=d27bfe7765a0b6cba41e63a27be720f0&oe=5FD5EB19",
-        "name": "name",
-        "price": 10,
-        "style": "style"
-      }
-    ],
-    "images": [
-      "https://i.pinimg.com/originals/43/7e/df/437edf96d102a55cd0cfb8809c12b39b.jpg"
-    ],
-    "type": 0,
-    "lat": -34.550147599999995, "long": -58.7553284
+  static Map<String, List<ReservationModel>> parseReservations(reservations){
 
-  },
-  {
-    "address": "Pichincha 3004, San Miguel, Buenos Aires, Argentina",
-    "alias": "Lam-asdaw",
-    "at": "05:03:22.387216",
-    "from": "03:06:29.387703",
-    "available": ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes"],
-    "hairdress": [
-      {
-        "description": "description",
-        "image": "https://instagram.faep10-1.fna.fbcdn.net/v/t51.2885-15/sh0.08/e35/p640x640/124288946_799981497235754_3946732440877601169_n.jpg?_nc_ht=instagram.faep10-1.fna.fbcdn.net&_nc_cat=102&_nc_ohc=THNAVxZG-GgAX-ymy6Z&_nc_tp=24&oh=d27bfe7765a0b6cba41e63a27be720f0&oe=5FD5EB19",
-        "name": "name",
-        "price": 10,
-        "style": "style"
+    Map<String, List<ReservationModel>> resbkp = {};
+
+    for(ReservationModel model in reservations){
+      DateTime time = DateFormat("dd/MM/yyyy HH:mm").parse(model.dateTime);
+      if(resbkp[meses[time.month - 1 ]] == null){
+        resbkp[meses[time.month - 1]] = new List();
       }
-    ],
-    "images": [
-      "https://i.pinimg.com/originals/43/7e/df/437edf96d102a55cd0cfb8809c12b39b.jpg"
-    ],
-    "type": 2, "lat": -34.551822699999995, "long": -58.74890129999999
-
-  },
-  {
-    "available": ["Lunes", "Martes", "Miercoles"],
-    "address": "Maestro Sarmiento 3043, San Miguel, Buenos Aires, Argentina",
-    "alias": "aaaadf",
-    "at": "18:39:20.387419",
-    "from": "16:58:50.387838",
-    "hairdress": [
-      {
-        "description": "description",
-        "image": "https://instagram.faep10-1.fna.fbcdn.net/v/t51.2885-15/sh0.08/e35/p640x640/124288946_799981497235754_3946732440877601169_n.jpg?_nc_ht=instagram.faep10-1.fna.fbcdn.net&_nc_cat=102&_nc_ohc=THNAVxZG-GgAX-ymy6Z&_nc_tp=24&oh=d27bfe7765a0b6cba41e63a27be720f0&oe=5FD5EB19",
-        "name": "name",
-        "price": 10,
-        "style": "style"
-      }
-    ],
-    "images": [
-      "https://i.pinimg.com/originals/43/7e/df/437edf96d102a55cd0cfb8809c12b39b.jpg"
-    ],
-    "type": 0,
-    "lat": -34.548254799999995, "long": -58.74572190000001
-
-  },
-  {
-    "available": ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"],
-    "address": "Alexander Fleming 3691, San Miguel, Buenos Aires, Argentina",
-    "alias": "dsad-strip",
-    "at": "18:28:47.387504",
-    "from": "06:55:36.387922",
-    "hairdress": [
-      {
-        "description": "description",
-        "image": "https://instagram.faep10-1.fna.fbcdn.net/v/t51.2885-15/sh0.08/e35/p640x640/124288946_799981497235754_3946732440877601169_n.jpg?_nc_ht=instagram.faep10-1.fna.fbcdn.net&_nc_cat=102&_nc_ohc=THNAVxZG-GgAX-ymy6Z&_nc_tp=24&oh=d27bfe7765a0b6cba41e63a27be720f0&oe=5FD5EB19",
-        "name": "name",
-        "price": 10,
-        "style": "style"
-      }
-    ],
-    "images": [
-      "https://i.pinimg.com/originals/43/7e/df/437edf96d102a55cd0cfb8809c12b39b.jpg"
-    ],
-    "type": 0,
-    "lat": -34.565479499999995, "long": -58.728322999999996
-
-  },
-  {
-    "available": ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"],
-    "address": "Alexander Fleming 3691, San Miguel, Buenos Aires, Argentina",
-    "alias": "dasddddd-strip",
-    "at": "18:28:47.387504",
-    "from": "06:55:36.387922",
-    "hairdress": [
-      {
-        "description": "description",
-        "image": "https://instagram.faep10-1.fna.fbcdn.net/v/t51.2885-15/sh0.08/e35/p640x640/124288946_799981497235754_3946732440877601169_n.jpg?_nc_ht=instagram.faep10-1.fna.fbcdn.net&_nc_cat=102&_nc_ohc=THNAVxZG-GgAX-ymy6Z&_nc_tp=24&oh=d27bfe7765a0b6cba41e63a27be720f0&oe=5FD5EB19",
-        "name": "name",
-        "price": 10,
-        "style": "style"
-      }
-    ],
-    "images": [
-      "https://i.pinimg.com/originals/43/7e/df/437edf96d102a55cd0cfb8809c12b39b.jpg"
-    ],
-    "type": 0,
-    "lat": -34.565479499999995, "long": -58.728322999999996
-
-  },
-];
-
-  static List<ShopModel> parseOptions(toParse){
-    return toParse.map<ShopModel>((element) => ShopModel.fromJson(element)).toList();
+      resbkp[meses[time.month - 1]].add(model);
+    }
+    return resbkp;
   }
 
   Future<List<ShopModel>> filterByProximity(List<ShopModel> models) async {
@@ -217,7 +75,14 @@ class MainProvider extends ChangeNotifier{
   }
 
   Future<void> updateShops() async{
-    List<ShopModel> models = await compute(parseOptions, _locJSON);
+    List<ShopModel> models = await FirebaseUtils.getShops();
+    this.shops["0"].clear();
+    this.shops["1"].clear();
+    this.shops["2"].clear();
+
+    this.proximityShops["0"].clear();
+    this.proximityShops["1"].clear();
+    this.proximityShops["2"].clear();
     for (ShopModel model in models){
       this.shops["${model.type}"].add(model);
     }
@@ -227,6 +92,21 @@ class MainProvider extends ChangeNotifier{
       this.proximityShops["${model.type}"].add(model);
     }
     return;
+  }
+
+  Future<List<dynamic>> updateReservations() async{
+    List<Map<String, dynamic>> res = [];
+    if(this.reservations.isEmpty){
+      this.reservations = await compute(parseReservations, LocalData.user.reservations);
+    }
+
+    for(MapEntry<String, List<ReservationModel>> r in this.reservations.entries){
+      for(ReservationModel model in r.value){
+        res.add({'group': r.key, 'model': model});
+      }
+    }
+
+    return Future.value(res);
   }
 
   void notify(){

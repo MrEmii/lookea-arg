@@ -75,7 +75,6 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(child: Container(), preferredSize: Size.zero,),
       body: SafeArea(
         child: WillPopScope(
           onWillPop: () async {
@@ -103,7 +102,10 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
                   right: 0,
                   child: Container(
                     height: 55,
-                    color: LColors.black9,
+                    decoration: BoxDecoration(
+                      color: LColors.black9,
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(8))
+                    ),
                     child: homeBottomBar(),
                   )
                 )

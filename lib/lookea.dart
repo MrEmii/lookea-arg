@@ -1,6 +1,7 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
+import 'package:lookea/providers/CardProvider.dart';
 import 'package:lookea/providers/MainProvider.dart';
 import 'package:lookea/providers/NotificationsProvider.dart';
 import 'package:lookea/providers/ShopProvider.dart';
@@ -10,6 +11,7 @@ import 'package:lookea/screens/account/Account.dart';
 import 'package:lookea/screens/account/screens/AccountOptions.dart';
 import 'package:lookea/screens/account/screens/EditPassword.dart';
 import 'package:lookea/screens/account/screens/Payments.dart';
+import 'package:lookea/screens/lostpassword/LostPassword.dart';
 import 'package:lookea/screens/notifications/Notifications.dart';
 import 'package:lookea/screens/shop/ShopScreen.dart';
 import 'package:lookea/screens/shop/screens/ReservationScreen.dart';
@@ -35,6 +37,7 @@ class LookeaRouter extends StatelessWidget {
         ChangeNotifierProvider<MainProvider>(create: (_) => MainProvider()),
         ChangeNotifierProvider<ShopProvider>(create: (_) => ShopProvider()),
         ChangeNotifierProvider<PushNotificationProvider>(create: (_) => PushNotificationProvider()),
+        ChangeNotifierProvider<CardProvider>(create: (_) => CardProvider()),
       ],
       child: App(),
     );
@@ -52,7 +55,7 @@ class _AppState extends State<App> {
     "/splash": SplashScreen(),
     "/startup":StartupScreen(),
     "/signIn": SignInScreen(),
-    "/signIn/lostpassword": SignInScreen(),
+    "/signIn/lostpassword": LostPasswordScreen(),
     "/signUp": SignUpScreen(),
     "/register/shop": CreateShopScreen(),
     "/register/success": AccountCreatedScreen(),

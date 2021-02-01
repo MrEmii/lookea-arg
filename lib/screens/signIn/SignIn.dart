@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lookea/providers/NotificationsProvider.dart';
 import 'package:lookea/providers/SignInProvider.dart';
+import 'package:lookea/screens/signIn/screens/CodeAuth.dart';
 import 'dart:ui' as ui;
 
 import 'package:lookea/widgets/LColors.dart';
@@ -46,7 +47,7 @@ class _SignInScreenState extends State<SignInScreen> {
             children: [
               CustomPaint(
                 size: new Size(MediaQuery.of(context).size.width, 200),
-                painter: WaveTop(),
+                painter: WaveNormal(),
               ),
               Positioned(
                 top: 20,
@@ -82,7 +83,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           return "El correo no es correcto";
                         return null;
                       },
-                      placeholderStyle: TextStyle(color: LColors.white19, fontSize: 18)
+                      placeholderStyle: TextStyle(color: LColors.white19, fontSize: 14)
                     ),
                   ],
                 ),
@@ -90,11 +91,16 @@ class _SignInScreenState extends State<SignInScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Container(
-                      width: MediaQuery.of(context).size.width / 1.3,
-                      alignment: Alignment.bottomRight,
-                      padding: EdgeInsets.only(top: 20),
-                      child: Text("Olvidé mi contraseña", style: TextStyle(color: LColors.gray50, fontSize: 12))
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, "/signIn/lostpassword");
+                      },
+                      child: Container(
+                        width: MediaQuery.of(context).size.width / 1.3,
+                        alignment: Alignment.bottomRight,
+                        padding: EdgeInsets.only(top: 20),
+                        child: Text("Olvidé mi contraseña", style: TextStyle(color: LColors.gray50, fontSize: 12))
+                      ),
                     ),
                     TextInputComponent(
                       controller: provider.passwordController,
@@ -107,7 +113,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           return "Necesitamos tu contraseña!";
                         return null;
                       },
-                      placeholderStyle: TextStyle(color: LColors.white19, fontSize: 18),
+                      placeholderStyle: TextStyle(color: LColors.white19, fontSize: 14),
                     ),
                   ],
                 ),
@@ -117,16 +123,17 @@ class _SignInScreenState extends State<SignInScreen> {
                       OverlayUtils.showLoading(context);
 
                       String result =  await provider.login();
-                      if(result != ""){
+                      if(result.isNotEmpty){
                         Navigator.pop(context);
                         OverlayUtils.showAlert(context, description: result, dismissible: true);
+                      }else if(result == "code"){
+                        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => CodeAuthenticatorPage()), (Route<dynamic> route) => false);
                       }else{
                         Navigator.pop(context);
                         Navigator.pushNamed(context, "/");
                         provider.reset();
                         pushNotificationProvider.initNotifications();
                       }
-
                     }
                   },
                   margin: EdgeInsets.all(40),

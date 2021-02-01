@@ -10,6 +10,7 @@ import 'package:lookea/screens/account/widgets/AccountOption.dart';
 import 'package:lookea/utils/firebase_utils.dart';
 import 'package:lookea/widgets/LColors.dart';
 import 'package:lookea/widgets/LIcons.dart';
+import 'package:lookea/widgets/Waves.dart';
 import 'package:lookea/widgets/cached_image.dart';
 import 'package:lookea/utils/overlay_utils.dart';
 import 'package:provider/provider.dart';
@@ -30,7 +31,6 @@ class _AccountScreenState extends State<AccountScreen> {
     SignInProvider provider = Provider.of<SignInProvider>(context, listen: true);
     MainProvider mprovider = Provider.of<MainProvider>(context);
     return Scaffold(
-      backgroundColor: LColors.black9,
       appBar: AppBar(
         backgroundColor: LColors.black9,
         elevation: 0,
@@ -41,108 +41,106 @@ class _AccountScreenState extends State<AccountScreen> {
         centerTitle: true,
         title: new Text("Tú cuenta", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
       ),
-      body: Padding(
-        padding: EdgeInsets.only(top: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Stack(
-              alignment: Alignment.topCenter,
-              children: [
-                CachedImage(
-                  url: LocalData.user.photoUrl,
-                  width: 100,
-                  height: 100,
-                  borderRadius: BorderRadius.circular(100),
-                  placeholder: Container(
-                    width: 50,
-                    height: 50,
-                    child: CircularProgressIndicator(),
-                  ),
-                  errorImg: "assets/images/user/avatar-white.png"
-                ),
-                Positioned(
-                  bottom: -15,
-                  right: -15,
-                  child: GestureDetector(
-                    onTap: () async {
-                      OverlayUtils.showLoading(context);
-                      PickedFile file =  await getImage();
-                      UserModel model = LocalData.user;
-                      if(model.photoUrl == null || model.photoUrl.isEmpty || model.photoUrl != "none") await FirebaseUtils.deleteFile(path: "users/${model.id}/${model.id}");
-                      String url = await FirebaseUtils.uploadFile(path: "users/${model.id}", id: model.id,  image: File(file.path));
-                      await FirebaseUtils.updateAccount(model: model.copyWith(photoUrl: url));
-                      Navigator.pop(context);
-                      provider.notify();
-                      mprovider.notify();
-                    },
-                    child: Container(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Stack(
+            alignment: Alignment.topCenter,
+            children: [
+              CustomPaint(
+                size: new Size(MediaQuery.of(context).size.width, 200),
+                painter: WaveLarge(),
+              ),
+              Stack(
+                children: [
+                  CachedImage(
+                    url: LocalData.user.photoUrl,
+                    width: 100,
+                    height: 100,
+                    borderRadius: BorderRadius.circular(100),
+                    placeholder: Container(
                       width: 50,
                       height: 50,
-                      decoration: BoxDecoration(
-                        color: LColors.black9,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: Icon(LIcons.image, size: 18,),
+                      child: CircularProgressIndicator(),
+                    ),
+                    errorImg: "assets/images/user/avatar-white.png"
+                  ),
+                  Positioned(
+                    bottom: -15,
+                    right: -15,
+                    child: GestureDetector(
+                      onTap: () async {
+                        OverlayUtils.showLoading(context);
+                        PickedFile file =  await getImage();
+                        UserModel model = LocalData.user;
+                        if(model.photoUrl == null || model.photoUrl.isEmpty || model.photoUrl != "none") await FirebaseUtils.deleteFile(path: "users/${model.id}/${model.id}");
+                        String url = await FirebaseUtils.uploadFile(path: "users/${model.id}", id: model.id,  image: File(file.path));
+                        await FirebaseUtils.updateAccount(model: model.copyWith(photoUrl: url));
+                        Navigator.pop(context);
+                        provider.notify();
+                        mprovider.notify();
+                      },
+                      child: Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: LColors.black9,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Center(
+                          child: Icon(LIcons.image, size: 18,),
+                        ),
                       ),
                     ),
-                  ),
+                  )
+                ],
+              ),
+              Positioned(
+                bottom: 50,
+                child: Text("${LocalData.user.name} ${LocalData.user.lastname}", textAlign: TextAlign.center, style: TextStyle(color: LColors.gray6, fontSize: 20, fontWeight: FontWeight.bold),),
+              ),
+            ],
+          ),
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.symmetric(vertical: 10),
+              itemExtent: 100,
+              children: [
+                AccountOption(
+                  icon: LIcons.cog,
+                  name: "Opciones de cuenta",
+                  onTap: () => Navigator.pushNamed(context, "/account/options"),
+                ),
+                AccountOption(
+                  icon: LIcons.lock,
+                  name: "Editar contraseña",
+                  onTap: () => Navigator.pushNamed(context, "/account/password"),
+                ),
+                AccountOption(
+                  icon: LIcons.credit_card,
+                  name: "Métodos de pago",
+                  onTap: () => Navigator.pushNamed(context, "/account/payments"),
+                ),
+                AccountOption(
+                  icon: LIcons.question_circle,
+                  name: "Ayuda",
+                  onTap: (){
+                    print("HOLA");
+                  },
+                ),
+                AccountOption(
+                  icon: LIcons.exit,
+                  name: "Cerrar sesión",
+                  color: LColors.red61,
+                  onTap: (){
+                    FirebaseUtils.logout();
+                    Navigator.pushNamedAndRemoveUntil(context, "/startup", (Route<dynamic> route) => false);
+                  },
                 )
               ],
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 10),
-              child: Align(
-                child: Text("${LocalData.user.name} ${LocalData.user.lastname}", style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),),
-              ),
-            ),
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-                child: Container(
-                  color: Colors.white,
-                  child: ListView(
-                    itemExtent: 100,
-                    children: [
-                      AccountOption(
-                        icon: LIcons.cog,
-                        name: "Opciones de cuenta",
-                        onTap: () => Navigator.pushNamed(context, "/account/options"),
-                      ),
-                      AccountOption(
-                        icon: LIcons.lock,
-                        name: "Editar contraseña",
-                        onTap: () => Navigator.pushNamed(context, "/account/password"),
-                      ),
-                      AccountOption(
-                        icon: LIcons.credit_card,
-                        name: "Nétodos de pago",
-                        onTap: () => Navigator.pushNamed(context, "/account/payments"),
-                      ),
-                      AccountOption(
-                        icon: LIcons.question_circle,
-                        name: "Ayuda",
-                        onTap: (){
-                          print("HOLA");
-                        },
-                      ),
-                      AccountOption(
-                        icon: LIcons.exit,
-                        name: "Cerrar sesión",
-                        color: LColors.red61,
-                        onTap: (){
-                          FirebaseUtils.logout();
-                          Navigator.pushNamedAndRemoveUntil(context, "/startup", (Route<dynamic> route) => false);
-                        },
-                      )
-                    ],
-                  )
-                ),
-              )
             )
-          ],
-        ),
+          )
+        ],
       ),
    );
   }

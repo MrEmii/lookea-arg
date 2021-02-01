@@ -3,10 +3,10 @@ class ShopModel {
 
    final String alias;
    final String at;
-   final List<String> available;
+   final List<dynamic> available;
    final String from;
    final List<HairDresseModel> hairdress;
-   final List<String> images;
+   final List<dynamic> images;
    final String address;
    final int type;
 

@@ -15,7 +15,11 @@ class SignInProvider extends ChangeNotifier{
     try {
       UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(email: emailController.text, password: passwordController.text);
       await fetchUser(userCredential.user.uid);
-      return "";
+      if(userCredential.user.emailVerified){
+        return "";
+      }else{
+        return "code";
+      }
     } on FirebaseAuthException catch (e) {
       print(e.code);
       if (e.code == 'user-not-found') {
@@ -43,9 +47,7 @@ class SignInProvider extends ChangeNotifier{
   Future<void> fetchUser(uid) async{
     DocumentSnapshot doc = await FirebaseFirestore.instance.collection("users").doc(uid).get();
     UserModel model = UserModel.fromJson(doc.data());
-    LocalData.db.addUser(model).then((dbRes) {
-      LocalData.user = model;
-    });
+    await LocalData.db.createUser(model);
   }
 
   void reset(){
